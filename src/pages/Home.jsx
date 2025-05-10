@@ -2,19 +2,32 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import MainFeature from '../components/MainFeature';
+import QuizSelector from '../components/QuizSelector';
 import getIcon from '../utils/iconUtils';
 
 const Home = () => {
   const [isStarted, setIsStarted] = useState(false);
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [selectedTopic, setSelectedTopic] = useState(null);
+  const [selectedLevel, setSelectedLevel] = useState(null);
   
   const BrainIcon = getIcon('Brain');
   const AwardIcon = getIcon('Award');
   const ArrowRightIcon = getIcon('ArrowRight');
 
   const handleStartQuiz = () => {
-    setIsStarted(true);
-    toast.info("Quiz started! Good luck!");
+    setIsSelecting(true);
   };
+  
+  const handleSelectQuiz = (topicKey, levelKey) => {
+    setSelectedTopic(topicKey);
+    setSelectedLevel(levelKey);
+    setIsStarted(true);
+    
+    toast.info(`Starting ${topicKey} quiz (${levelKey} level). Good luck!`);
+  };
+  
+  const handleReset = () => setIsStarted(false);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -56,9 +69,15 @@ const Home = () => {
       icon: "BarChart"
     }
   ];
-
+  
   if (isStarted) {
-    return <MainFeature onReset={() => setIsStarted(false)} />;
+    return <MainFeature onReset={handleReset} topicKey={selectedTopic} levelKey={selectedLevel} />;
+  }
+  
+  if (isSelecting) {
+    return (
+      <QuizSelector onStartQuiz={handleSelectQuiz} />
+    );
   }
 
   return (
